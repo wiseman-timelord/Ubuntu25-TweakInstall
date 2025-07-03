@@ -16,7 +16,7 @@ This project includes install/tweaking for, ubuntu 25 and ubuntu 25 common packa
 - GPU setup provides options for AMDGPU (Non-ROCm and ROCm), NVIDIA, and Intel GPU drivers and optimizations for graphics performance. (Both)
 - The main menu dynamically updates with the status of each installation step for user clarity. (Both)
 - Option to implement Windows-like commands such as dir, copy, move, del, md, rd, cls, type, where, echo, shutdown, and restart for familiar terminal use. (Both)
-- Option to disable sudo password prompts, AppArmor, and password complexity requirements to mimic Windows-like behavior (e.g., disabling UAC and Software Protection for ease of administration). (Both)
+- Option to disable sudo password prompts, and password complexity requirements to mimic Windows-like behavior (e.g., disabling UAC and Software Protection for ease of administration). (Both)
 - User folder configurations allow individual folder tweaks (e.g., Desktop, Downloads) with current paths displayed, supporting reset to defaults for personalized file organization. (Both)
 
 ### Preview:
@@ -59,13 +59,11 @@ Selection; Menu Options 1-5, Exit Program = X:
 - hopefully whatever tweak or install you did worked out for you, if not, then I advise asking gpt/deepseek/grok/etc, and input the output you got from the terminal with your prompt.
 
 ### Notation:
-- This program is typically tested/updated when the creator does a new install of ubuntu 24.
+- This program is typically tested/updated when the creator does a new install of ubuntu 25.
 - Minimum Windows 10 for Vertio/Kvm/QEmu Drivers from `Virtio-Win-0.1.262.Iso`, Windows 7-81 did not complete Setup.  
-- For `Ubuntu 24` Assistance, go for example, here `https://chatgpt.com/g/g-sQSBQqeR8-sysadmin-for-ubuntu-22-04` or here `https://chatgpt.com/g/g-OPkIvf0HN-java-21-postgresql-16`, and prompt mentioning your specific version is 24.xx. 
-- Would make a better GPT for 24, but people also need to, go fund me or patreon, to assist in paying gpt subscription to do so again..
-- Its for 24, because thats the version I was using at the time, this may later expand like 22-24 or there will be new version ie Ubuntu26-TweakInstall.
-- I was unable to install `24.04.x`, so I installed `24.10 Beta`, which did not have these install issues, and turned out quite good. 
-- Its a continuation of the `Fedora40-TweakInstall` project, `Ubuntu24-TweakInstall` is more safer/complete. `Fedora40-TweakInstall` is hidden due to untested tweaks, that require inspection/fixing/testing, which wont happen unless I reinstall Fedora.
+- For `Ubuntu 25` Assistance, I advise, ChatGPT `https://chatgpt.com` or DeepSeek `https://chat.deepseek.com/`, and prompt mentioning your specific version is 25.xx.
+- Version 25 required me to use the USB installer in the motherboard usb port, and would NOT work in the front usb port.
+- Its a continuation of the `Ubuntu24-TweakInstall` project.
 - Additional Windows Commands in the terminal are shortcut to relating linux commands  (fixing/improving is done here `/etc/profile.d/windows_commands.sh`)...
 ```
 `dir` - Lists directory contents in a detailed format.
@@ -86,7 +84,7 @@ Selection; Menu Options 1-5, Exit Program = X:
 ### File Structure
 Program files are like this...
 ```
-.\Ubuntu24-TweakInstall.sh
+.\Ubuntu25-TweakInstall.sh
 .\launcher.py
 .\scripts\interface.py
 .\scripts\utility.py
@@ -100,4 +98,4 @@ Program files are like this...
 4. The Individual `VM` related install seems odd now, needs to be made into Modular submenu again. `LLM` option had to be removed, error with build-tools was it? But still, LLM was a bad choice, because people will want custom Torch version possibly. Maybe Just expand out the options for the VM setup, so as to include different VM modules.
 
 ### Warnings:
-- If there is some issue with a device, after restarting, after using the Installer, then try re-starting again, this fixed itself for me, but I had a blank screen on one of the monitors, its an iffy old monitor prone to issues though.
+- If there is some issue with a device, after restarting, after using the Installer, then try re-starting again, this fixed itself for me, but I had a blank screen on one of the monitors.
