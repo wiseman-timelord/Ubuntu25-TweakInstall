@@ -85,9 +85,9 @@ verify_files() {
     done
     
     if [ $missing -eq 0 ]; then
-        echo "\nAll files present"
+        printf "\nAll files present.\n\n\n\n\n\n\n\n\n\n"
     else
-        echo "\nMissing required files"
+        printf "\nMissing required files.\n\n\n\n\n\n\n\n\n\n"
     fi
     
     print_thin_separator
@@ -114,8 +114,7 @@ while true; do
             ;;
         [Xx])
             clear_screen
-            echo "Exiting Bash Script..."
-            echo ""
+            printf "Exiting Bash Script...\n"
             sleep 2
             exit 0
             ;;
