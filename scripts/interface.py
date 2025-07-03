@@ -241,66 +241,62 @@ def system_tweaks_menu():
     while True:
         os.system('clear')
         print_title("Tweaks and Hacks")
-        sudo_status = "Enabled" if check_sudo_nopasswd() else "Disabled"
-        auto_login_status = "Enabled" if check_auto_login() else "Disabled"
-        windows_commands_status = "Enabled" if check_windows_commands() else "Disabled"
-        hang_timeout = get_hang_timeout()
-        wellbeing_status = "Enabled" if check_wellbeing_panel() else "Disabled"
-        print(f"    1. Toggle sudo password prompt (Status: {sudo_status})\n\n"
-              f"    2. Toggle auto-login (Status: {auto_login_status})\n\n"
-              f"    3. Implement Windows-like commands (Status: {windows_commands_status})\n\n"
-              f"    4. Adjust GNOME hang timeout (Current: {hang_timeout}s)\n\n"
-              f"    5. Toggle Wellbeing Panel (Status: {wellbeing_status})\n\n")
+        
+        # Get current statuses
+        statuses = {
+            "sudo": "Enabled" if check_sudo_nopasswd() else "Disabled",
+            "auto_login": "Enabled" if check_auto_login() else "Disabled",
+            "windows_commands": "Enabled" if check_windows_commands() else "Disabled",
+            "hang_timeout": f"{get_hang_timeout()}s"
+        }
+        
+        # Print menu
+        print(f"\n\n\n\n    1. Toggle sudo password prompt (Status: {statuses['sudo']})\n\n"
+              f"    2. Toggle auto-login (Status: {statuses['auto_login']})\n\n"
+              f"    3. Implement Windows-like commands (Status: {statuses['windows_commands']})\n\n"
+              f"    4. Adjust GNOME hang timeout (Current: {statuses['hang_timeout']})\n\n\n\n\n")
+        
         thin_separator()
-        print("Selection; Menu Options 1-5, Back To Main = B: ", end="")
+        print("Selection; Menu Options 1-4, Back To Main = B: ", end="")
+        
         choice = input().strip().upper()
-        if choice == "1":
-            os.system('clear')
-            print_title("Toggling Sudo Password Prompt")
-            try:
-                toggle_sudo_nopasswd()
-                print("\nSudo password prompt updated.\n")
-            except Exception as e:
-                print(f"\nError during sudo password prompt toggle: {e}\n")
-            input("Press Enter to continue...")
-        elif choice == "2":
-            os.system('clear')
-            print_title("Toggling Auto-Login")
-            try:
-                toggle_auto_login()
-                print("\nAuto-login updated.\n")
-            except Exception as e:
-                print(f"\nError during auto-login toggle: {e}\n")
-            input("Press Enter to continue...")
-        elif choice == "3":
-            os.system('clear')
-            print_title("Implementing Windows-like Commands")
-            try:
-                implement_windows_commands()
-                print("\nWindows-like commands implemented.\n")
-            except Exception as e:
-                print(f"\nError during Windows-like commands implementation: {e}\n")
-            input("Press Enter to continue...")
-        elif choice == "4":
-            os.system('clear')
-            print_title("Adjusting GNOME Hang Timeout")
-            try:
-                adjust_hang_timeout()
-                print("\nHang timeout updated.\n")
-            except Exception as e:
-                print(f"\nError during GNOME hang timeout adjustment: {e}\n")
-            input("Press Enter to continue...")
-        elif choice == "5":
-            os.system('clear')
-            print_title("Toggling Wellbeing Panel")
-            try:
-                toggle_wellbeing_panel()
-                print("\nWellbeing Panel setting updated.\n")
-            except Exception as e:
-                print(f"\nError during Wellbeing Panel toggle: {e}\n")
-            input("Press Enter to continue...")
-        elif choice == "B":
+        
+        # Menu actions
+        actions = {
+            "1": {
+                "title": "Toggling Sudo Password Prompt",
+                "function": toggle_sudo_nopasswd,
+                "success": "Sudo password prompt updated"
+            },
+            "2": {
+                "title": "Toggling Auto-Login",
+                "function": toggle_auto_login,
+                "success": "Auto-login updated"
+            },
+            "3": {
+                "title": "Implementing Windows-like Commands",
+                "function": implement_windows_commands,
+                "success": "Windows-like commands implemented"
+            },
+            "4": {
+                "title": "Adjusting GNOME Hang Timeout",
+                "function": adjust_hang_timeout,
+                "success": "Hang timeout updated"
+            }
+        }
+        
+        if choice == "B":
             break
+            
+        if choice in actions:
+            os.system('clear')
+            print_title(actions[choice]["title"])
+            try:
+                actions[choice]["function"]()
+                print(f"\n{actions[choice]['success']}.\n")
+            except Exception as e:
+                print(f"\nError: {e}\n")
+            input("Press Enter to continue...")
         else:
             print("\nInvalid choice. Press Enter to try again...")
             input()
