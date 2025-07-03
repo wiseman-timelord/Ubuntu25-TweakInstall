@@ -1,12 +1,8 @@
 # Ubuntu 25 - Tweaks & Installer
-- Status: Alpha (converting code now).
+- Status: Beta (seems to work ok so far).
 
 ### Description:
 This project includes install/tweaking for, ubuntu 25 and ubuntu 25 common packages. The Installer saves time, researching and finding the correct commands, to do basic stuff after install of `Ubuntu 25.04`, ensuring system updates and installations, are printed and errors handled. The tweaker script focuses on implementing features and other tweaks, including the addition of Windows-like common commands to go along side the relating common linux commands. The point is to take the hastle out of the bulk of the work, or if you are new to linux and are unsure.
-
-<br>
-(editing below here)
-<br>
 
 ### Features:
 - Basic OS installation includes system updates and essential tools like vim, nano, curl, wget, git, and htop. (Both)
