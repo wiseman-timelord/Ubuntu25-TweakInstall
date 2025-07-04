@@ -1,5 +1,5 @@
 # Ubuntu 25 - Tweaks & Installer
-- Status: Beta (seems to work ok so far).
+- Status: Beta (tested and seems to work).
 
 ### Description:
 This project includes install/tweaking for, ubuntu 25 and ubuntu 25 common packages. The Installer saves time, researching and finding the correct commands, to do basic stuff after install of `Ubuntu 25.04`, ensuring system updates and installations, are printed and errors handled. The tweaker script focuses on implementing features and other tweaks, including the addition of Windows-like common commands to go along side the relating common linux commands. The point is to take the hastle out of the bulk of the work, or if you are new to linux and are unsure.
@@ -88,7 +88,7 @@ Program files are like this...
 
 ### Development 
 - Planned work...
-1. Add hybrid graphics install with radeon as main and nvidia as compute, in the method I used.
+1. Add hybrid graphics install with radeon as main and nvidia as compute, in the method I used. Possibly detect cards, then present options, which is main/secondary/compute, and install appropriately.
 2. The Individual `VM` related install seems odd now, needs to be made into Modular submenu again. `LLM` option had to be removed, error with build-tools was it? But still, LLM was a bad choice, because people will want custom Torch version possibly. Maybe Just expand out the options for the VM setup, so as to include different VM modules.
 
 ### Warnings:
