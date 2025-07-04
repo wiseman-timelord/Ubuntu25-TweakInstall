@@ -2,6 +2,8 @@
 import subprocess
 import os
 from typing import Dict, Tuple
+import tempfile
+import shutil
 
 # Get the original user when run with sudo
 SUDO_USER = os.getenv("SUDO_USER")
@@ -20,6 +22,8 @@ DEFAULT_DIRS = {
     "XDG_PICTURES_DIR": f"{HOME_DIR}/Pictures",
     "XDG_VIDEOS_DIR": f"{HOME_DIR}/Videos"
 }
+
+
 
 def read_user_dirs() -> Tuple[str, Dict[str, str]]:
     """Read user directory configurations"""
@@ -138,9 +142,29 @@ def setup_software_managers() -> bool:
         print(f"Software manager setup failed: {e}")
         return False
 
-def install_opensnitch() -> bool:
-    """Install OpenSnitch firewall with verification"""
+def is_opensnitch_installed() -> bool:
+    """Check if OpenSnitch is installed"""
     try:
+        subprocess.run(["which", "opensnitch"], check=True, 
+                      stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        return True
+    except subprocess.CalledProcessError:
+        return False
+
+# Update the install_opensnitch function
+def install_opensnitch() -> bool:
+    """Install or uninstall OpenSnitch firewall with verification"""
+    try:
+        # Check if already installed
+        if is_opensnitch_installed():
+            print("\nOpenSnitch is already installed. Uninstalling...")
+            subprocess.run(["sudo", "apt", "remove", "-y", "opensnitch", "python3-opensnitch-ui"], check=True)
+            # Remove autostart entry
+            autostart_file = os.path.join(HOME_DIR, ".config/autostart/opensnitch-ui.desktop")
+            if os.path.exists(autostart_file):
+                os.remove(autostart_file)
+            return False  # Return False for uninstall
+
         version = "1.7.1-1"
         base_url = "https://github.com/evilsocket/opensnitch/releases/download/v1.7.1/"
         
@@ -156,14 +180,20 @@ def install_opensnitch() -> bool:
             print(f"Unsupported architecture: {arch}")
             return False
 
-        # Download packages
-        opensnitch_pkg = f"opensnitch_{version}_{pkg_arch}.deb"
-        ui_pkg = "python3-opensnitch-ui_1.7.1-1_all.deb"
+        # Create temporary directory
+        temp_dir = tempfile.mkdtemp()
         
-        subprocess.run(["wget", "-q", f"{base_url}{opensnitch_pkg}"], check=True)
-        subprocess.run(["wget", "-q", f"{base_url}{ui_pkg}"], check=True)
+        # Download packages with progress
+        opensnitch_pkg = os.path.join(temp_dir, f"opensnitch_{version}_{pkg_arch}.deb")
+        ui_pkg = os.path.join(temp_dir, "python3-opensnitch-ui_1.7.1-1_all.deb")
+        
+        print("Downloading OpenSnitch package...")
+        subprocess.run(["wget", "--show-progress", f"{base_url}opensnitch_{version}_{pkg_arch}.deb", "-O", opensnitch_pkg], check=True)
+        print("\nDownloading OpenSnitch UI package...")
+        subprocess.run(["wget", "--show-progress", f"{base_url}python3-opensnitch-ui_1.7.1-1_all.deb", "-O", ui_pkg], check=True)
         
         # Verify checksums
+        print("\nVerifying package integrity...")
         actual_checksum = subprocess.check_output(
             ["sha256sum", opensnitch_pkg], text=True
         ).split()[0]
@@ -173,17 +203,36 @@ def install_opensnitch() -> bool:
             return False
 
         # Install packages
+        print("\nInstalling packages...")
         subprocess.run([
             "sudo", "apt", "install", "-y",
-            f"./{opensnitch_pkg}", f"./{ui_pkg}"
+            opensnitch_pkg, ui_pkg
         ], check=True)
         
         # Enable service
-        subprocess.run(["sudo", "systemctl", "enable", "--now", "opensnitchd"], check=True)
+        subprocess.run(["sudo", "systemctl", "enable", "--now", "opensnitch"], check=True)
+        
+        # Configure autostart
+        autostart_dir = os.path.join(HOME_DIR, ".config/autostart")
+        os.makedirs(autostart_dir, exist_ok=True)
+        with open(os.path.join(autostart_dir, "opensnitch-ui.desktop"), "w") as f:
+            f.write("[Desktop Entry]\nType=Application\nName=OpenSnitch\nExec=opensnitch-ui\n")
+        
+        # Run OpenSnitch UI
+        print("\nLaunching OpenSnitch UI...")
+        subprocess.Popen(["opensnitch-ui"], start_new_session=True)
+        
         return True
     except subprocess.CalledProcessError as e:
-        print(f"OpenSnitch installation failed: {e}")
+        print(f"OpenSnitch operation failed: {e}")
         return False
+    except Exception as e:
+        print(f"Error during OpenSnitch operation: {e}")
+        return False
+    finally:
+        # Clean up temporary directory
+        if 'temp_dir' in locals() and os.path.exists(temp_dir):
+            shutil.rmtree(temp_dir)
 
 def install_wine_winetricks() -> bool:
     """Install Wine and Winetricks"""

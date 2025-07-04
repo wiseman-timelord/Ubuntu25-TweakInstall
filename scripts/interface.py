@@ -108,11 +108,15 @@ def software_management_menu():
     while True:
         os.system('clear')
         print_title("Software and Packages")
+        
+        # Get OpenSnitch status
+        opensnitch_status = "Installed" if is_opensnitch_installed() else "Not installed"
+        
         print("    1. Install virtualization packages (KVM, Libvirt)\n\n"
               "    2. Setup software managers (Gnome, Synaptic, Snap)\n\n"
               "    3. Install Wine and Winetricks\n\n"
               "    4. Install Python and related packages\n\n"
-              "    5. Install OpenSnitch Firewall\n\n")
+              f"    5. OpenSnitch Firewall (Status: {opensnitch_status})\n\n")
         thin_separator()
         print("Selection; Menu Options 1-5, Back To Main = B: ", end="")
         choice = input().strip().upper()
@@ -163,15 +167,25 @@ def software_management_menu():
             input("Press Enter to continue...")
         elif choice == "5":
             os.system('clear')
-            print_title("Installing OpenSnitch Firewall")
+            action = "Installing" if not is_opensnitch_installed() else "Uninstalling"
+            print_title(f"{action} OpenSnitch Firewall")
             try:
-                if install_opensnitch():
+                result = install_opensnitch()
+                if result:
                     print("\nOpenSnitch installed successfully.\n")
                     print("NOTE: Configuration UI available in applications menu")
+                    print("      OpenSnitch will launch automatically at login")
+                    # Launch in background without waiting
+                    subprocess.Popen(['opensnitch-ui'], 
+                                   stdout=subprocess.DEVNULL,
+                                   stderr=subprocess.DEVNULL,
+                                   start_new_session=True)
+                elif result is False:  # Uninstall case
+                    print("\nOpenSnitch uninstalled successfully.\n")
                 else:
-                    print("\nOpenSnitch installation failed.\n")
+                    print("\nOperation failed.\n")
             except Exception as e:
-                print(f"\nError during OpenSnitch installation: {e}\n")
+                print(f"\nError during OpenSnitch operation: {e}\n")
             input("Press Enter to continue...")
         elif choice == "B":
             break
