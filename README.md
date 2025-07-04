@@ -88,6 +88,7 @@ Program files are like this...
 
 ### Development 
 - Planned work...
+1, there seems to be 1 option in the first submenu, maybe we can break it down into a few options.
 1. Add opensnitch using method found to be working via flatpack as instructed on the github repository. (this method works)
 2. Add hybrid graphics install with radeon as main and nvidia as compute, in the method I used.
 3. `Start + e` :- Go to `Settings>Keyboard>Add Custom`, then type in `nautilus` for the command, and put `Start + e` in the Shortcut, and give it a fitting title like `Explorer Shortcut`. NEed to add this and other tweaks for keyboard shortcuts from windows.
