@@ -1,3 +1,7 @@
+#!/usr/bin/env python3
+# Script: `.\scripts\interface.py`
+
+# Imports
 import os
 from scripts.utility import *
 
@@ -111,14 +115,17 @@ def software_management_menu():
         
         # Get OpenSnitch status
         opensnitch_status = "Installed" if is_opensnitch_installed() else "Not installed"
+        # Get Notepadqq status
+        notepadqq_status = "Installed" if is_notepadqq_installed() else "Not installed"
         
         print("    1. Install virtualization packages (KVM, Libvirt)\n\n"
               "    2. Setup software managers (Gnome, Synaptic, Snap)\n\n"
               "    3. Install Wine and Winetricks\n\n"
               "    4. Install Python and related packages\n\n"
-              f"    5. OpenSnitch Firewall (Status: {opensnitch_status})\n\n")
+              f"    5. OpenSnitch Firewall (Status: {opensnitch_status})\n\n"
+              f"    6. Notepadqq Text Editor (Status: {notepadqq_status})\n\n")
         thin_separator()
-        print("Selection; Menu Options 1-5, Back To Main = B: ", end="")
+        print("Selection; Menu Options 1-6, Back To Main = B: ", end="")
         choice = input().strip().upper()
         if choice == "1":
             os.system('clear')
@@ -163,7 +170,7 @@ def software_management_menu():
                 else:
                     print("\nPython installation completed with some errors.\n")
             except Exception as e:
-                print(f"\nError during Python packages installation: {e}\n")
+                print(f"\nError during141 Python packages installation: {e}\n")
             input("Press Enter to continue...")
         elif choice == "5":
             os.system('clear')
@@ -186,6 +193,22 @@ def software_management_menu():
                     print("\nOperation failed.\n")
             except Exception as e:
                 print(f"\nError during OpenSnitch operation: {e}\n")
+            input("Press Enter to continue...")
+        elif choice == "6":
+            os.system('clear')
+            action = "Installing" if not is_notepadqq_installed() else "Uninstalling"
+            print_title(f"{action} Notepadqq Text Editor")
+            try:
+                result = install_notepadqq()
+                if result:
+                    print("\nNotepadqq installed successfully with log suppression.\n")
+                    print("NOTE: Notepadqq logs are suppressed via rsyslog filter.")
+                elif result is False:
+                    print("\nNotepadqq uninstalled successfully.\n")
+                else:
+                    print("\nOperation failed.\n")
+            except Exception as e:
+                print(f"\nError during Notepadqq operation: {e}\n")
             input("Press Enter to continue...")
         elif choice == "B":
             break

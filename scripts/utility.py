@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Script: `.\scripts\utility.py`
+
+# Imports
 import subprocess
 import os
 from typing import Dict, Tuple
@@ -233,6 +236,55 @@ def install_opensnitch() -> bool:
         # Clean up temporary directory
         if 'temp_dir' in locals() and os.path.exists(temp_dir):
             shutil.rmtree(temp_dir)
+
+def is_notepadqq_installed():
+    """
+    Check if Notepadqq is installed by checking if the notepadqq command exists.
+    Returns True if installed, False otherwise.
+    """
+    try:
+        result = subprocess.run(['dpkg', '-l', 'notepadqq'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        return 'ii' in result.stdout
+    except subprocess.CalledProcessError:
+        return False
+
+def install_notepadqq():
+    """
+    Installs or uninstalls Notepadqq on Ubuntu 25.04 and configures an rsyslog filter to suppress its logs.
+    Returns True for successful install, False for successful uninstall, None for failure.
+    """
+    try:
+        is_installed = is_notepadqq_installed()
+        if is_installed:
+            # Uninstall Notepadqq
+            subprocess.run(['apt-get', 'remove', '-y', 'notepadqq'], check=True)
+            subprocess.run(['add-apt-repository', '--remove', '-y', 'ppa:notepadqq-team/notepadqq'], check=True)
+            subprocess.run(['apt-get', 'update'], check=True)
+            # Remove rsyslog filter
+            filter_path = '/etc/rsyslog.d/10-notepadqq.conf'
+            if os.path.exists(filter_path):
+                os.remove(filter_path)
+                subprocess.run(['systemctl', 'restart', 'rsyslog'], check=True)
+            print("Notepadqq uninstalled successfully.")
+            return False
+        else:
+            # Install Notepadqq
+            subprocess.run(['add-apt-repository', '-y', 'ppa:notepadqq-team/notepadqq'], check=True)
+            subprocess.run(['apt-get', 'update'], check=True)
+            subprocess.run(['apt-get', 'install', '-y', 'notepadqq'], check=True)
+            # Create rsyslog filter to suppress notepadqq logs
+            filter_content = ':programname, contains, "notepadqq" stop\n'
+            with open('/etc/rsyslog.d/10-notepadqq.conf', 'w') as f:
+                f.write(filter_content)
+            subprocess.run(['systemctl', 'restart', 'rsyslog'], check=True)
+            print("Notepadqq installed successfully with rsyslog filter.")
+            return True
+    except subprocess.CalledProcessError as e:
+        print(f"Error during Notepadqq operation: {e}")
+        return None
+    except Exception as e:
+        print(f"Unexpected error during Notepadqq operation: {e}")
+        return None
 
 def install_wine_winetricks() -> bool:
     """Install Wine and Winetricks"""

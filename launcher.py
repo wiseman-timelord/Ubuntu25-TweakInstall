@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Script: `.\launcher.py`
+
+# Imports
 import os
 import subprocess
 from scripts.interface import main_menu
