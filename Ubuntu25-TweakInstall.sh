@@ -119,9 +119,7 @@ while true; do
             exit 0
             ;;
         *)
-            clear_screen
             echo "Invalid option: $choice"
-            print_thin_separator
             sleep 2
             ;;
     esac
