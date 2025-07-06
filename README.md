@@ -55,7 +55,7 @@ Selection; Menu Options 1-5, Exit Program = X:
 - hopefully whatever tweak or install you did worked out for you, if not, then I advise asking gpt/deepseek/grok/etc, and input the output you got from the terminal with your prompt.
 
 ### Notation:
-- This program is typically tested/updated when the creator does a new install of ubuntu 25.
+- This program is typically tested/updated when the creator does a new install of ubuntu 25. 
 - Minimum Windows 10 for Vertio/Kvm/QEmu Drivers from `Virtio-Win-0.1.262.Iso`, Windows 7-81 did not complete Setup.  
 - For `Ubuntu 25` Assistance, I advise, ChatGPT `https://chatgpt.com` or DeepSeek `https://chat.deepseek.com/`, and prompt mentioning your specific version is 25.xx.
 - Version 25 required me to use the USB installer in the motherboard usb port, and would NOT work in the front usb port.
@@ -88,6 +88,7 @@ Program files are like this...
 
 ### Development 
 - Planned work...
+1. Investigate why AppCenter no longer works correctly, possibly just need reboot, or could be something to do with authorization hack, however, the alternate `Software Manager` (installed by TweakInstall) works well enough for now.
 1. Add hybrid graphics install with radeon as main and nvidia as compute, in the method I used. Possibly detect cards, then present options, which is main/secondary/compute, and install appropriately.
 2. The Individual `VM` related install seems odd now, needs to be made into Modular submenu again. `LLM` option had to be removed, error with build-tools was it? But still, LLM was a bad choice, because people will want custom Torch version possibly. Maybe Just expand out the options for the VM setup, so as to include different VM modules.
 - No release until next reinstall of OS, to ensure fully tested, but it is assumed most stuff works. 
