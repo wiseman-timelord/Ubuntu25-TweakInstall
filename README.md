@@ -90,8 +90,8 @@ Program files are like this...
 - Was using 24.10 until around start of july 2025 and have separate windows computer, so program is in early development. While most of the options are tested since converstion from 24.10, but a few like virtualization may not work. here is the current plan for update...
 1. Add hybrid graphics install with radeon as main and nvidia as compute, in the method I used. Possibly detect cards, then present options, which is main/secondary/compute, and install appropriately.
 2. The Individual `VM` related install seems odd now, needs to be made into Modular submenu again. `LLM` option had to be removed, error with build-tools was it? But still, LLM was a bad choice, because people will want custom Torch version possibly. Maybe Just expand out the options for the VM setup, so as to include different VM modules.
-- No release until next reinstall of OS, to ensure fully tested, but it is assumed most stuff works. 
 3. I am not at that stage in my own ubuntu 25.04 os install/config, so as to require virtualization, but that needs testing.
+4. No release until full test, likely when reinstall of OS happens, to ensure fully tested, but it is assumed most stuff works. 
 
 ### Warnings:
 - If there is some issue with a device, after restarting, after using the Installer, then try re-starting again, this fixed itself for me, but I had a blank screen on one of the monitors.
