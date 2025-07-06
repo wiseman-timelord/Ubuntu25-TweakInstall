@@ -55,7 +55,6 @@ Selection; Menu Options 1-5, Exit Program = X:
 - hopefully whatever tweak or install you did worked out for you, if not, then I advise asking gpt/deepseek/grok/etc, and input the output you got from the terminal with your prompt.
 
 ### Notation:
-- This is not release version, that is because, while most of the options are tested, but a few like virtualization may not work. I am not at that stage in my own ubuntu 25.04 os install/config, so as to require virtualization, as, was using 24.10 until around start of july 2025 and have separate windows computer.
 - If, installed opensnitch and given application cannot access the internet (such as so far only App Center), you can always temporary turn off OpenSnitch by right clicking the icon in tray area. Otherwise no issues.  
 - Minimum Windows 10 for Vertio/Kvm/QEmu Drivers from `Virtio-Win-0.1.262.Iso`, Windows 7-81 did not complete Setup.  
 - For `Ubuntu 25` Assistance, I advise, ChatGPT `https://chatgpt.com` or DeepSeek `https://chat.deepseek.com/`, and prompt mentioning your specific version is 25.xx.
@@ -88,10 +87,11 @@ Program files are like this...
 ```
 
 ### Development 
-- Planned work...
+- Was using 24.10 until around start of july 2025 and have separate windows computer, so program is in early development. While most of the options are tested since converstion from 24.10, but a few like virtualization may not work. here is the current plan for update...
 1. Add hybrid graphics install with radeon as main and nvidia as compute, in the method I used. Possibly detect cards, then present options, which is main/secondary/compute, and install appropriately.
 2. The Individual `VM` related install seems odd now, needs to be made into Modular submenu again. `LLM` option had to be removed, error with build-tools was it? But still, LLM was a bad choice, because people will want custom Torch version possibly. Maybe Just expand out the options for the VM setup, so as to include different VM modules.
 - No release until next reinstall of OS, to ensure fully tested, but it is assumed most stuff works. 
+3. I am not at that stage in my own ubuntu 25.04 os install/config, so as to require virtualization, but that needs testing.
 
 ### Warnings:
 - If there is some issue with a device, after restarting, after using the Installer, then try re-starting again, this fixed itself for me, but I had a blank screen on one of the monitors.
