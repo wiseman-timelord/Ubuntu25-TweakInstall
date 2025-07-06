@@ -113,19 +113,21 @@ def software_management_menu():
         os.system('clear')
         print_title("Software and Packages")
         
-        # Get OpenSnitch status
+        # Get statuses
         opensnitch_status = "Installed" if is_opensnitch_installed() else "Not installed"
-        # Get Notepadqq status
         notepadqq_status = "Installed" if is_notepadqq_installed() else "Not installed"
+        tor_status = "Installed" if is_tor_installed() else "Not installed"  # Added
         
         print("    1. Install virtualization packages (KVM, Libvirt)\n\n"
               "    2. Setup software managers (Gnome, Synaptic, Snap)\n\n"
               "    3. Install Wine and Winetricks\n\n"
               "    4. Install Python and related packages\n\n"
               f"    5. OpenSnitch Firewall (Status: {opensnitch_status})\n\n"
-              f"    6. Notepadqq Text Editor (Status: {notepadqq_status})\n\n")
+              f"    6. Notepadqq Text Editor (Status: {notepadqq_status})\n\n"
+              f"    7. Tor Browser (Status: {tor_status})\n\n")
+        
         thin_separator()
-        print("Selection; Menu Options 1-6, Back To Main = B: ", end="")
+        print("Selection; Menu Options 1-7, Back To Main = B: ", end="")
         choice = input().strip().upper()
         if choice == "1":
             os.system('clear')
@@ -210,6 +212,20 @@ def software_management_menu():
             except Exception as e:
                 print(f"\nError during Notepadqq operation: {e}\n")
             input("Press Enter to continue...")
+        elif choice == "7":
+            os.system('clear')
+            action = "Installing" if not is_tor_installed() else "Uninstalling"
+            print_title(f"{action} Tor Browser")
+            result = install_tor()
+            if result:
+                print("\nTor Browser installed successfully.\n")
+                print("NOTE: Access via Applications menu or with command: /opt/tor-browser/Browser/start-tor-browser")
+            elif result is False:
+                print("\nTor Browser uninstalled successfully.\n")
+            else:
+                print("\nOperation failed.\n")
+            input("Press Enter to continue...")
+        
         elif choice == "B":
             break
         else:

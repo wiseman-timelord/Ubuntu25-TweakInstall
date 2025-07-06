@@ -4,7 +4,7 @@
 # Imports
 import subprocess
 import os
-from typing import Dict, Tuple
+from typing import Dict, Tuple, Optional
 import tempfile
 import shutil
 
@@ -144,6 +144,52 @@ def setup_software_managers() -> bool:
     except subprocess.CalledProcessError as e:
         print(f"Software manager setup failed: {e}")
         return False
+
+def is_tor_installed() -> bool:
+    """Check if Tor Browser is installed"""
+    return os.path.exists("/opt/tor-browser/Browser/start-tor-browser")
+
+def install_tor() -> Optional[bool]:
+    """Install or uninstall Tor Browser with dependency handling"""
+    try:
+        if is_tor_installed():
+            print("\nTor Browser is already installed. Uninstalling...")
+            # Remove installation directory (owned by root due to sudo in install)
+            subprocess.run(["sudo", "rm", "-rf", "/opt/tor-browser"], check=True)
+            # Remove desktop entry from user's home directory
+            user = os.getenv("SUDO_USER", os.getlogin())
+            desktop_entry = os.path.join(HOME_DIR, ".local/share/applications/tor-browser.desktop")
+            if os.path.exists(desktop_entry):
+                subprocess.run(["sudo", "-u", user, "rm", desktop_entry], check=True)
+            return False  # Successful uninstall
+        else:
+            print("\nInstalling Tor Browser...")
+            # Create installation directory
+            os.makedirs("/opt/tor-browser", exist_ok=True)
+            
+            # Download and extract Tor Browser (per notation)
+            url = "https://archive.torproject.org/tor-package-archive/torbrowser/14.5.4/tor-expert-bundle-linux-x86_64-14.5.4.tar.gz"
+            subprocess.run(
+                f"curl -L {url} | sudo tar -xz -C /opt/tor-browser --strip-components=1",
+                shell=True, check=True
+            )
+            
+            # Install dependencies (per notation)
+            subprocess.run([
+                "sudo", "apt", "install", "-y", 
+                "libgtk-3-0", "libnss3", "libasound2"
+            ], check=True)
+            
+            # Register application (per notation)
+            subprocess.run([
+                "sudo", "/opt/tor-browser/Browser/start-tor-browser", 
+                "--register-app"
+            ], check=True)
+            
+            return True  # Successful install
+    except subprocess.CalledProcessError as e:
+        print(f"Tor operation failed: {e}")
+        return None
 
 def is_opensnitch_installed() -> bool:
     """Check if OpenSnitch is installed"""
