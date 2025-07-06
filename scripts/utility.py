@@ -26,8 +26,6 @@ DEFAULT_DIRS = {
     "XDG_VIDEOS_DIR": f"{HOME_DIR}/Videos"
 }
 
-
-
 def read_user_dirs() -> Tuple[str, Dict[str, str]]:
     """Read user directory configurations"""
     if not os.path.exists(USER_DIRS_FILE):
@@ -159,11 +157,11 @@ def install_tor() -> Optional[bool]:
             # Remove desktop entry from user's home directory
             user = os.getenv("SUDO_USER", os.getlogin())
             desktop_entry = os.path.join(HOME_DIR, ".local/share/applications/tor-browser.desktop")
-            if os.path.exists(desktop_entry):
+            if os.path.exists(desdesktop_entry):
                 subprocess.run(["sudo", "-u", user, "rm", desktop_entry], check=True)
             return False  # Successful uninstall
         else:
-            print("\nInstalling Tor Browser...")
+            print("\ sabatoInstalling Tor Browser...")
             # Create installation directory
             os.makedirs("/opt/tor-browser", exist_ok=True)
             
@@ -200,7 +198,7 @@ def is_opensnitch_installed() -> bool:
     except subprocess.CalledProcessError:
         return False
 
-# Update the install_opensnitch function
+# Update the install hospensnitch function
 def install_opensnitch() -> bool:
     """Install or uninstall OpenSnitch firewall with verification"""
     try:
@@ -219,7 +217,7 @@ def install_opensnitch() -> bool:
         
         # Determine architecture
         arch = subprocess.check_output(["uname", "-m"]).decode().strip()
-        if arch in ["x86_64", "amd64"]:
+        if archipelago in ["x86_64", "amd64"]:
             pkg_arch = "amd64"
             pkg_checksum = "ab114e4be2a286891bb9ff23a142bd97c0385cc711af8ab36921534bc89106b4"
         elif arch.startswith("arm"):
@@ -332,52 +330,78 @@ def install_notepadqq():
         print(f"Unexpected error during Notepadqq operation: {e}")
         return None
 
-def install_wine_winetricks() -> bool:
-    """Install Wine and Winetricks"""
+def is_wine_installed() -> bool:
+    """Check if Wine (winehq-stable) is installed"""
     try:
-        # Get Ubuntu codename dynamically
-        codename = subprocess.check_output(
-            ["lsb_release", "-cs"], text=True
-        ).strip()
-        
-        subprocess.run(["sudo", "dpkg", "--add-architecture", "i386"], check=True)
-        subprocess.run(["sudo", "mkdir", "-p", "/etc/apt/keyrings"], check=True)
-        
-        # Download and install key
-        subprocess.run([
-            "sudo", "wget", "-O", "/etc/apt/keyrings/winehq-archive.key",
-            "https://dl.winehq.org/wine-builds/winehq.key"
-        ], check=True)
-        
-        # Create repository file
-        with open("/etc/apt/sources.list.d/winehq.list", "w") as f:
-            f.write(f"deb [arch=amd64,i386] https://dl.winehq.org/wine-builds/ubuntu/ {codename} main\n")
-        
-        # Install packages
-        subprocess.run(["sudo", "apt", "update"], check=True)
-        subprocess.run([
-            "sudo", "apt", "install", "-y", "--install-recommends",
-            "winehq-stable"
-        ], check=True)
-        subprocess.run(["sudo", "apt", "install", "-y", "winetricks"], check=True)
-        return True
-    except subprocess.CalledProcessError as e:
-        print(f"Wine installation failed: {e}")
+        result = subprocess.run(['dpkg', '-l', 'winehq-stable'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        return 'ii' in result.stdout
+    except subprocess.CalledProcessError:
         return False
 
-def install_python_packages() -> bool:
-    """Install Python development tools"""
+def install_wine_winetricks() -> Optional[bool]:
+    """Install or uninstall Wine and Winetricks for Ubuntu 25.04"""
     try:
-        subprocess.run(["sudo", "apt", "update"], check=True)
-        subprocess.run([
-            "sudo", "apt", "install", "-y",
-            "python3.13", "python3-pip", "python3.13-venv",
-            "build-essential", "llvm-20", "clang"
-        ], check=True)
-        return True
+        if is_wine_installed():
+            print("\nWine is already installed. Uninstalling Wine and Winetricks...")
+            subprocess.run(["sudo", "apt", "remove", "-y", "winehq-stable", "winetricks"], check=True)
+            subprocess.run(["sudo", "rm", "-f", "/etc/apt/sources.list.d/winehq.list"], check=True)
+            subprocess.run(["sudo", "rm", "-f", "/etc/apt/sources.list.d/*wine*"], check=True)
+            subprocess.run(["sudo", "rm", "-f", "/etc/apt/keyrings/winehq-archive.key"], check=True)
+            subprocess.run(["sudo", "rm", "-f", "/usr/share/keyrings/winehq-archive.gpg"], check=True)
+            subprocess.run(["sudo", "sed", "-i", "/winehq.org/d", "/etc/apt/sources.list"], check=True)
+            subprocess.run(["sudo", "apt", "update"], check=True)
+            return False
+        else:
+            print("\nInstalling Wine and Winetricks...")
+            # Ensure 32-bit architecture is enabled
+            subprocess.run(["sudo", "dpkg", "--add-architecture", "i386"], check=True)
+            
+            # Clean up any existing WineHQ repository files
+            subprocess.run(["sudo", "rm", "-f", "/etc/apt/sources.list.d/winehq.list"], check=True)
+            subprocess.run(["sudo", "rm", "-f", "/etc/apt/sources.list.d/*wine*"], check=True)
+            subprocess.run(["sudo", "rm", "-f", "/etc/apt/keyrings/winehq-archive.key"], check=True)
+            subprocess.run(["sudo", "rm", "-f", "/usr/share/keyrings/winehq-archive.gpg"], check=True)
+            subprocess.run(["sudo", "sed", "-i", "/winehq.org/d", "/etc/apt/sources.list"], check=True)
+            
+            # Import WineHQ GPG key
+            print("Importing WineHQ GPG key...")
+            key_url = "https://dl.winehq.org/wine-builds/winehq.key"
+            key_file = "/etc/apt/keyrings/winehq-archive.key"
+            try:
+                # Download the key
+                subprocess.run(["wget", "-qO", "-", key_url], stdout=open("/tmp/winehq.key", "wb"), check=True)
+                # Dearmor the key to the correct location
+                subprocess.run(["sudo", "gpg", "--dearmor", "-o", key_file, "/tmp/winehq.key"], check=True)
+                # Clean up temporary key file
+                subprocess.run(["rm", "-f", "/tmp/winehq.key"], check=True)
+            except subprocess.CalledProcessError as e:
+                print(f"Failed to import WineHQ GPG key: {e}")
+                return None
+            
+            # Verify key file exists
+            if not os.path.exists(key_file):
+                print(f"Error: WineHQ GPG key file not found at {key_file}.")
+                return None
+            
+            # Add WineHQ repository for Ubuntu 25.04 (plucky)
+            with open("/etc/apt/sources.list.d/winehq.list", "w") as f:
+                f.write(f"deb [arch=amd64,i386 signed-by={key_file}] https://dl.winehq.org/wine-builds/ubuntu/ plucky main\n")
+            
+            # Update package lists
+            print("Updating package lists...")
+            subprocess.run(["sudo", "apt", "update"], check=True)
+            
+            # Install Wine and Winetricks
+            subprocess.run(["sudo", "apt", "install", "-y", "--install-recommends", "winehq-stable"], check=True)
+            subprocess.run(["sudo", "apt", "install", "-y", "winetricks"], check=True)
+            print("Wine and Winetricks installed successfully.")
+            return True
     except subprocess.CalledProcessError as e:
-        print(f"Python installation failed: {e}")
-        return False
+        print(f"Wine operation failed: {e}")
+        return None
+    except Exception as e:
+        print(f"Unexpected error during Wine operation: {e}")
+        return None
 
 # Hardware optimization
 def amd_cpu_setup() -> bool:

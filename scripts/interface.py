@@ -109,6 +109,7 @@ def system_installation_menu():
             input()
 
 def software_management_menu():
+    """Manage software and package installations with status display"""
     while True:
         os.system('clear')
         print_title("Software and Packages")
@@ -116,11 +117,12 @@ def software_management_menu():
         # Get statuses
         opensnitch_status = "Installed" if is_opensnitch_installed() else "Not installed"
         notepadqq_status = "Installed" if is_notepadqq_installed() else "Not installed"
-        tor_status = "Installed" if is_tor_installed() else "Not installed"  # Added
+        tor_status = "Installed" if is_tor_installed() else "Not installed"
+        wine_status = "Installed" if is_wine_installed() else "Not installed"
         
         print("\n    1. Install virtualization packages (KVM, Libvirt)\n\n"
               "    2. Setup software managers (Gnome, Synaptic, Snap)\n\n"
-              "    3. Install Wine and Winetricks\n\n"
+              f"    3. Install Wine and Winetricks (Status: {wine_status})\n\n"
               "    4. Install Python and related packages\n\n"
               f"    5. OpenSnitch Firewall (Status: {opensnitch_status})\n\n"
               f"    6. Notepadqq Text Editor (Status: {notepadqq_status})\n\n"
@@ -154,14 +156,18 @@ def software_management_menu():
             input("Press Enter to continue...")
         elif choice == "3":
             os.system('clear')
-            print_title("Installing Wine and Winetricks")
+            action = "Installing" if not is_wine_installed() else "Uninstalling"
+            print_title(f"{action} Wine and Winetricks")
             try:
-                if install_wine_winetricks():
+                result = install_wine_winetricks()
+                if result is True:
                     print("\nWine and Winetricks installed successfully.\n")
+                elif result is False:
+                    print("\nWine and Winetricks uninstalled successfully.\n")
                 else:
-                    print("\nWine installation completed with some errors.\n")
+                    print("\nOperation failed.\n")
             except Exception as e:
-                print(f"\nError during Wine and Winetricks installation: {e}\n")
+                print(f"\nError during Wine and Winetricks operation: {e}\n")
             input("Press Enter to continue...")
         elif choice == "4":
             os.system('clear')
@@ -172,7 +178,7 @@ def software_management_menu():
                 else:
                     print("\nPython installation completed with some errors.\n")
             except Exception as e:
-                print(f"\nError during141 Python packages installation: {e}\n")
+                print(f"\nError during Python packages installation: {e}\n")
             input("Press Enter to continue...")
         elif choice == "5":
             os.system('clear')
@@ -184,12 +190,11 @@ def software_management_menu():
                     print("\nOpenSnitch installed successfully.\n")
                     print("NOTE: Configuration UI available in applications menu")
                     print("      OpenSnitch will launch automatically at login")
-                    # Launch in background without waiting
                     subprocess.Popen(['opensnitch-ui'], 
                                    stdout=subprocess.DEVNULL,
                                    stderr=subprocess.DEVNULL,
                                    start_new_session=True)
-                elif result is False:  # Uninstall case
+                elif result is False:
                     print("\nOpenSnitch uninstalled successfully.\n")
                 else:
                     print("\nOperation failed.\n")
@@ -225,7 +230,6 @@ def software_management_menu():
             else:
                 print("\nOperation failed.\n")
             input("Press Enter to continue...")
-        
         elif choice == "B":
             break
         else:
