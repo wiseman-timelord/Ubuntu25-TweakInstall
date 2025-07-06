@@ -88,7 +88,6 @@ Program files are like this...
 
 ### Development 
 - Planned work...
-1. Investigate why AppCenter no longer works correctly, possibly just need reboot, or could be something to do with authorization hack, however, the alternate `Software Manager` (installed by TweakInstall) works well enough for now.
 1. Add hybrid graphics install with radeon as main and nvidia as compute, in the method I used. Possibly detect cards, then present options, which is main/secondary/compute, and install appropriately.
 2. The Individual `VM` related install seems odd now, needs to be made into Modular submenu again. `LLM` option had to be removed, error with build-tools was it? But still, LLM was a bad choice, because people will want custom Torch version possibly. Maybe Just expand out the options for the VM setup, so as to include different VM modules.
 - No release until next reinstall of OS, to ensure fully tested, but it is assumed most stuff works. 
