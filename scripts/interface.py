@@ -118,7 +118,7 @@ def software_management_menu():
         notepadqq_status = "Installed" if is_notepadqq_installed() else "Not installed"
         tor_status = "Installed" if is_tor_installed() else "Not installed"  # Added
         
-        print("    1. Install virtualization packages (KVM, Libvirt)\n\n"
+        print("\n    1. Install virtualization packages (KVM, Libvirt)\n\n"
               "    2. Setup software managers (Gnome, Synaptic, Snap)\n\n"
               "    3. Install Wine and Winetricks\n\n"
               "    4. Install Python and related packages\n\n"
