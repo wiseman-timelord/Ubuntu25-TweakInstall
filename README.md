@@ -55,7 +55,7 @@ Selection; Menu Options 1-5, Exit Program = X:
 - hopefully whatever tweak or install you did worked out for you, if not, then I advise asking gpt/deepseek/grok/etc, and input the output you got from the terminal with your prompt.
 
 ### Notation:
-- If, installed opensnitch and given application cannot access the internet, you can always temporary turn off OpenSnitch. 
+- If, installed opensnitch and given application cannot access the internet (such as so far only App Center), you can always temporary turn off OpenSnitch, otherwise no issues. 
 - This program is typically tested/updated when the creator does a new install of ubuntu 25. 
 - Minimum Windows 10 for Vertio/Kvm/QEmu Drivers from `Virtio-Win-0.1.262.Iso`, Windows 7-81 did not complete Setup.  
 - For `Ubuntu 25` Assistance, I advise, ChatGPT `https://chatgpt.com` or DeepSeek `https://chat.deepseek.com/`, and prompt mentioning your specific version is 25.xx.
