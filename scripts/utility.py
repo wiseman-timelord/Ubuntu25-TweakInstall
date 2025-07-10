@@ -404,6 +404,134 @@ def install_wine_winetricks() -> Optional[bool]:
         return None
 
 # Hardware optimization
+def is_cuda_installed() -> bool:
+    """Check if CUDA Toolkit is properly installed"""
+    try:
+        # Check nvcc existence and validity
+        nvcc_check = subprocess.run(["which", "nvcc"], capture_output=True, text=True)
+        if nvcc_check.returncode != 0:
+            return False
+            
+        # Verify nvcc outputs version info
+        version_check = subprocess.run(["nvcc", "--version"], capture_output=True, text=True)
+        return "release" in version_check.stdout
+        
+    except Exception:
+        return False
+
+def install_cuda_toolkit() -> Optional[bool]:
+    """Install/uninstall CUDA Toolkit for Ubuntu 25.04 using Ubuntu 24.04 repo"""
+    try:
+        # Pre-flight checks
+        if not os.path.exists("/usr/bin/nvidia-smi"):
+            print("ERROR: NVIDIA drivers not detected. Install drivers first.")
+            return None
+            
+        if is_cuda_installed():
+            print("\nUninstalling CUDA Toolkit...")
+            subprocess.run([
+                "sudo", "apt", "purge", "-y", 
+                "cuda-toolkit*", "cuda-*", "nvidia-cuda-toolkit"
+            ], check=True)
+            subprocess.run(["sudo", "apt", "autoremove", "-y"], check=True)
+            subprocess.run(["sudo", "rm", "/etc/apt/sources.list.d/cuda*.list"], check=True)
+            subprocess.run(["sudo", "rm", "-f", "/etc/apt/trusted.gpg.d/cuda*.gpg"], check=True)
+            # Clean environment variables
+            subprocess.run(["sed", "-i", "/CUDA/d", f"{HOME_DIR}/.bashrc"], check=True)
+            subprocess.run(["sudo", "rm", "-f", "/etc/profile.d/cuda.sh"], check=True)
+            # Remove symlinks
+            subprocess.run(["sudo", "rm", "-f", "/usr/local/cuda"], check=True)
+            subprocess.run(["sudo", "rm", "-f", "/usr/local/cuda-12.5"], check=True)
+            subprocess.run(["sudo", "apt", "update"])
+            return False
+            
+        # Installation process
+        print("\nInstalling CUDA Toolkit for Ubuntu 25.04 using Ubuntu 24.04 repository...")
+        
+        # 1. Install prerequisites
+        subprocess.run([
+            "sudo", "apt", "install", "-y", 
+            "software-properties-common", "wget"
+        ], check=True)
+        
+        # 2. Add CUDA repository (Ubuntu 24.04 repo for 25.04 compatibility)
+        cuda_version = "12-5"  # Current stable
+        keyring_deb = "cuda-keyring_1.1-1_all.deb"
+        
+        # Use Ubuntu 24.04 repository
+        repo_url = "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-keyring_1.1-1_all.deb"
+        
+        subprocess.run(["wget", repo_url], check=True)
+        subprocess.run(["sudo", "dpkg", "-i", keyring_deb], check=True)
+        os.remove(keyring_deb)
+        
+        # 3. Install CUDA
+        subprocess.run(["sudo", "apt", "update"], check=True)
+        install_result = subprocess.run([
+            "sudo", "apt", "install", "-y", 
+            f"cuda-toolkit-{cuda_version}"
+        ], capture_output=True, text=True)
+        
+        if install_result.returncode != 0:
+            if "Secure Boot" in install_result.stderr:
+                print("\nSECURE BOOT CONFLICT:")
+                print("You must enroll NVIDIA's key in Secure Boot:")
+                print("1. Reboot and enter BIOS")
+                print("2. Enroll MOK when prompted")
+                print("3. Complete installation after reboot")
+            return None
+            
+        # 4. Post-install configuration
+        # Create cuda symlink (skip if already exists)
+        if not os.path.exists("/usr/local/cuda"):
+            subprocess.run(["sudo", "ln", "-s", f"/usr/local/cuda-{cuda_version.replace('-','.')}", "/usr/local/cuda"], check=True)
+        
+        # Add to system-wide profile
+        with open("/etc/profile.d/cuda.sh", "w") as f:
+            f.write("#!/bin/sh\n")
+            f.write("export PATH=/usr/local/cuda/bin:$PATH\n")
+            f.write("export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH\n")
+        subprocess.run(["sudo", "chmod", "+x", "/etc/profile.d/cuda.sh"])
+        
+        # Install missing components
+        subprocess.run([
+            "sudo", "apt", "install", "-y",
+            f"cuda-nvcc-{cuda_version}", 
+            f"cuda-nvrtc-dev-{cuda_version}"
+        ], check=True)
+        
+        # 5. Verify installation
+        try:
+            # Check using absolute path to avoid PATH issues
+            nvcc_check = subprocess.run(["/usr/local/cuda/bin/nvcc", "--version"], 
+                                      capture_output=True, text=True, check=True)
+            if "release" in nvcc_check.stdout:
+                print("\nCUDA Toolkit successfully installed")
+                print("Run 'source /etc/profile.d/cuda.sh' or reboot to apply paths")
+                return True
+            print("\nWARNING: nvcc found but version check failed")
+            return None
+        except subprocess.CalledProcessError:
+            print("\nERROR: nvcc verification failed after installation")
+            # Try alternative verification
+            try:
+                nvidia_smi = subprocess.run(["nvidia-smi"], capture_output=True, text=True, check=True)
+                if "CUDA Version" in nvidia_smi.stdout:
+                    print("CUDA detected through nvidia-smi but nvcc missing")
+                    print("Try manually installing: sudo apt install cuda-nvcc-12-5")
+                return None
+            except:
+                return None
+            
+    except subprocess.CalledProcessError as e:
+        print(f"\nCUDA operation failed: {e}")
+        if "404" in str(e):
+            print("Repository may not be available for Ubuntu 24.04/25.04")
+        return None
+    except Exception as e:
+        print(f"\nUnexpected error: {e}")
+        return None
+
 def amd_cpu_setup() -> bool:
     """Configure AMD CPU microcode"""
     try:

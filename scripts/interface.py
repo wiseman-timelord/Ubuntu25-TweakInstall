@@ -302,12 +302,14 @@ def gpu_setup_menu():
     while True:
         os.system('clear')
         print_title("Graphics Setup")
+        cuda_status = "Installed" if is_cuda_installed() else "Not installed"
         print("    1. AMDGPU (Non-ROCm)\n\n"
               "    2. AMDGPU (ROCm)\n\n"
               "    3. NVIDIA GPU\n\n"
-              "    4. Intel GPU\n\n")
+              "    4. Intel GPU\n\n"
+              f"    5. NVIDIA CUDA Toolkit (Status: {cuda_status})\n\n")
         thin_separator()
-        print("Selection; Menu Options 1-4, Back To Main = B: ", end="")
+        print("Selection; Menu Options 1-5, Back To Main = B: ", end="")
         choice = input().strip().upper()
         if choice == "1":
             os.system('clear')
@@ -344,6 +346,22 @@ def gpu_setup_menu():
                 print("\nIntel GPU setup completed.\n")
             except Exception as e:
                 print(f"\nError during Intel GPU setup: {e}\n")
+            input("Press Enter to continue...")
+        elif choice == "5":
+            os.system('clear')
+            action = "Uninstalling" if is_cuda_installed() else "Installing"
+            print_title(f"{action} NVIDIA CUDA Toolkit")
+            try:
+                result = install_cuda_toolkit()
+                if result is True:
+                    print("\nCUDA Toolkit installed successfully.\n")
+                    print("NOTE: You may need to reboot and set environment variables.")
+                elif result is False:
+                    print("\nCUDA Toolkit uninstalled successfully.\n")
+                else:
+                    print("\nOperation failed.\n")
+            except Exception as e:
+                print(f"\nError during CUDA Toolkit operation: {e}\n")
             input("Press Enter to continue...")
         elif choice == "B":
             break
